@@ -4,4 +4,4 @@ This is the repository for the Microchip Capstone project called 'Microchip Tech
 ASU Temp Campus using Embedded Systems and Machine Learning'. 
 
 The project is made by [Tanishq Mor](https://github.com/exposedtalent), Carter Dunn,
-Amber Kahklen, Maxwell Calhoun, Hunter White, and David Mangoli
+Amber Kahklen, [Maxwell Calhoun](https://github.com/Maxwell-Calhoun), Hunter White, and David Mangoli
