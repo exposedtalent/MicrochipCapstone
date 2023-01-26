@@ -1,4 +1,3 @@
-#include <log.h>
 #include <led_ctrl.h>
 #include <Wire.h>
 #include "SparkFunBME280.h"
@@ -12,8 +11,9 @@ void setup(void) {
   LedCtrl.on(Led::USER);
   pinMode(iled, OUTPUT);
   digitalWrite(iled, LOW); //iled default closed
-  Log.begin(115200);
-  Log.setLogLevel(LogLevel::DEBUG);
+  Serial3.begin(115200);
+  //Log.begin(115200);
+  //Log.setLogLevel(LogLevel::DEBUG);
   delay(50);
 
   //Begin communication over I2C

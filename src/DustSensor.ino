@@ -1,4 +1,3 @@
-#include <log.h>
 #define COV_RATIO 0.2 //ug/mmm / mv
 #define NO_DUST_VOLTAGE 400 //mv
 #define SYS_VOLTAGE 3300 //mv
@@ -48,13 +47,17 @@ float getDust() {
   digitalWrite(iled, LOW);
 
   // logging info for debugging
-  Log.infof("unfiltered ADC: %d\n", adcvalue);
+  //Log.infof("unfiltered ADC: %d\n", adcvalue);
+  Serial3.print("unfiltered ADC: ");
+  Serial3.print(adcvalue);
+  Serial3.println();
   adcvalue = Filter(adcvalue);
-  Log.infof("filtered ADC: %d\n", adcvalue);
-  
+  Serial3.print("filtered ADC: ");
+  Serial3.print(adcvalue);
+  Serial3.println();
   //covert voltage (mv)
   voltage = (SYS_VOLTAGE / 1024.0) * adcvalue * 11;
-
+  //Log.infof("voltage: %f\n", voltage);
   //voltage to density
   if (voltage >= NO_DUST_VOLTAGE) {
     voltage -= NO_DUST_VOLTAGE;
@@ -65,6 +68,9 @@ float getDust() {
   }
 
   //display the result
-  Log.infof("The current dust concentration is: %d ug/m3\n\n", density);
+  Serial3.print("The current dust concentration is: ");
+  Serial3.print(density);
+  Serial3.print(" ug/m3\n\n");  
+  
   return density;
 }
