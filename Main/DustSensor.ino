@@ -10,20 +10,16 @@ int Filter(int m)
   const int _buff_max = 10;
   int i;
   
-  if(flag_first == 0)
-  {
+  if (flag_first == 0) {
     flag_first = 1;
-    for(i = 0, sum = 0; i < _buff_max; i++)
-    {
+    for(i = 0, sum = 0; i < _buff_max; i++) {
       _buff[i] = m;
       sum += _buff[i];
     }
     return m;
-  }
-  else
-  {
+  } else {
     sum -= _buff[0];
-    for(i = 0; i < (_buff_max - 1); i++)
+    for (i = 0; i < (_buff_max - 1); i++)
     {
       _buff[i] = _buff[i + 1];
     }
@@ -45,19 +41,11 @@ float getDust() {
   delayMicroseconds(280);
   adcvalue = analogRead(vout);
   digitalWrite(iled, LOW);
-
-  // logging info for debugging
-  //Log.infof("unfiltered ADC: %d\n", adcvalue);
-  Serial3.print("unfiltered ADC: ");
-  Serial3.print(adcvalue);
-  Serial3.println();
   adcvalue = Filter(adcvalue);
-  Serial3.print("filtered ADC: ");
-  Serial3.print(adcvalue);
-  Serial3.println();
+
   //covert voltage (mv)
   voltage = (SYS_VOLTAGE / 1024.0) * adcvalue * 11;
-  //Log.infof("voltage: %f\n", voltage);
+
   //voltage to density
   if (voltage >= NO_DUST_VOLTAGE) {
     voltage -= NO_DUST_VOLTAGE;
