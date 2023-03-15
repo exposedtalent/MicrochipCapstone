@@ -4,6 +4,7 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 #include <log.h>
+#include <String.h>
 #define iled PIN_PE2 // D5
 #define vout PIN_PD6 // A0
 #define RXD2 PIN_PF5
@@ -41,9 +42,12 @@ void setup(void) {
 
 void loop(void) {
   powerUpZMOD();
+  algoOpt();
   getDust();
   printValues();
+  Serial3.println(getAQI());
+  Serial3.println(getNO2());
+  Serial3.println(getO3());
   powerDownZMOD();
   delay(1000);
-  // TODO ADD SHUT DOWN FUNCTIONS HERE
 }
