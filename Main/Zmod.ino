@@ -53,7 +53,7 @@ String getAQI() {
 
 void algoOpt() {
   if(Serial2)  {
-    Serial3.println("Getting AQI");
+    Serial3.println("Doing ZMOD Optimizations");
     memset (zmod_response, 0, SIZE);
     String ID = "";
       // will return S\n if succesful
@@ -78,7 +78,6 @@ String getNO2() {
         Serial2.print ("NO\n");
         Serial2.readBytesUntil('\n', zmod_response, SIZE);
         NO2 = String(zmod_response);
-        Serial3.println(NO2);
       }
     Serial3.println("Returning NO2");
     return NO2;
