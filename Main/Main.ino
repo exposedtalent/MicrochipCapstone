@@ -12,6 +12,38 @@
 #define USART_RXMODE0_bm  (1<<1)  /* Receiver Mode bit 0 mask. */
 Adafruit_BME280 bme; // I2C
 
+// DISCLAIMER CODE WONKY AGAIN
+// in a file called low_power.cpp located at Arduino\libraries\AVR-IoT-Cellular\src
+// there is this function
+// ISR(RTC_PIT_vect) {
+//     RTC.PITINTFLAGS = RTC_PI_bm;
+//     pit_triggered   = true;
+// }
+// comment it out, or else you will get an error saying "multiple definitions of: __vector_6"
+// it's because there are multiple definition for an interrupt and getting rid of one of them
+// makes the code work. awesome :)
+
+// RTC code used from DxCore documentation
+void RTC_init(void)
+{
+  /* Initialize RTC: */
+  while (RTC.STATUS > 0)
+  {
+    ;                                   /* Wait for all register to be synchronized */
+  }
+  RTC.CLKSEL = RTC_CLKSEL_INT32K_gc;    /* 32.768kHz Internal Ultra-Low-Power Oscillator (OSCULP32K) */
+
+  RTC.PITINTCTRL = RTC_PI_bm;           /* PIT Interrupt: enabled */
+
+  RTC.PITCTRLA = RTC_PERIOD_CYC32768_gc /* RTC Clock Cycles 16384, resulting in 32.768kHz/32768 = 1Hz = 1 sec.*/
+  | RTC_PITEN_bm;                       /* Enable PIT counter: enabled */
+}
+
+ISR(RTC_PIT_vect)
+{
+  RTC.PITINTFLAGS = RTC_PI_bm;          /* Clear interrupt flag by writing '1' (required) */
+}
+
 void setup(void) {
   LedCtrl.begin();
   LedCtrl.startupCycle();
@@ -19,6 +51,13 @@ void setup(void) {
   pinMode(iled, OUTPUT);
   digitalWrite(iled, LOW); //iled default closed
   Serial3.begin(9600);
+
+  RTC_init(); // enable RTC
+
+  // set type of sleep mode, this is the one that uses the minimum amount of power
+  // Only module that will be on is the RTC, everything else is off
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  sleep_enable(); // enables the sleep mode functionality
 
   // for USART comms with the sensor
   Serial2.pins(TXD2, RXD2);
@@ -40,6 +79,7 @@ void setup(void) {
   delay(50);
 }
 
+#define TIME_TO_SLEEP_IN_SECS 10 // edit value to how long you want board to sleep, currently at 10 secs
 void loop(void) {
   powerUpZMOD();
   algoOpt();
@@ -49,5 +89,14 @@ void loop(void) {
   Serial3.println(getNO2());
   Serial3.println(getO3());
   powerDownZMOD();
-  delay(1000);
+  //delay(1000);
+
+  // put board to sleep, shuts down every module except RTC and PIT module
+  Serial3.println("I sleep now");
+  delay(100);
+  for(int i = 0; i < TIME_TO_SLEEP_IN_SECS; i++) // sleep for the time according to TIME_TO_SLEEP_IN_SECS
+  {
+    sleep_cpu();
+  }
+  Serial3.println("I awake");
 }
