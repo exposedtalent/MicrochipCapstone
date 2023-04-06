@@ -1,11 +1,12 @@
-#include <Arduino.h>
-#include <Wire.h>
-#include <String.h>
-#include <log.h>
-
 #define SIZE 8
 char returnFromMemset[SIZE]; // biggest return value from zmod should be xxxx.x\n
 char* zmod_response = returnFromMemset;
+
+void initZmod() {
+  // for USART comms with the sensor
+  Serial2.pins(TXD2, RXD2);
+  Serial2.begin(9600);
+}
 
 void powerUpZMOD() {
   if(Serial2)  {

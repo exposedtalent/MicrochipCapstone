@@ -4,6 +4,11 @@
 #define iled PIN_PE2 // D5
 #define vout PIN_PD6 // A0
 
+void initDust() {
+  pinMode(iled, OUTPUT);
+  digitalWrite(iled, LOW); //iled default closed
+}
+
 int Filter(int m)
 {
   static int flag_first = 0, _buff[10], sum;
