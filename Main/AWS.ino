@@ -9,18 +9,6 @@
 char mqtt_sub_topic[128];
 char mqtt_pub_topic[128];
 
-void initAWS() {
-  if (!status) {
-      Serial3.print("Starting initialization of MQTT Polling for AWS\r\n");
-      Serial3.print("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
-      Serial3.print("        ID of 0xFF probably means a bad address, a BMP 180 or BMP 085\n");
-      Serial3.print("   ID of 0x56-0x58 represents a BMP 280,\n");
-      Serial3.print("        ID of 0x60 represents a BME 280.\n");
-      Serial3.print("        ID of 0x61 represents a BME 680.\n");
-      while (1) delay(10);
-  }
-}
-
 bool initMQTTTopics() {
     ECC608.begin();
 
