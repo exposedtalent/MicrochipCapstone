@@ -68,7 +68,7 @@ void loop(void) {
     Serial3.println("DATA IS FULL");
     String temp = stringify(0,77);
     Serial3.println(temp);
-    delay(1000)
+    delay(1000);
     Serial3.println();
     temp = stringify(77,144);
     Serial3.println(temp);
