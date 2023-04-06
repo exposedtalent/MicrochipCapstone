@@ -5,7 +5,6 @@
 #define vout PIN_PD6 // A0
 
 void initDust() {
-  pinMode(iled, OUTPUT);
   digitalWrite(iled, LOW); //iled default closed
 }
 
@@ -36,6 +35,15 @@ int Filter(int m)
   }
 }
 
+void warmUp() {
+  uint32_t time = getTime() + 10;
+  while (time > getTime()) {
+    //Serial3.println("warming up");
+    getDust();
+    delay(50);
+  }
+}
+
 float getDust() {
   //variables
   float density, voltage;
@@ -59,11 +67,6 @@ float getDust() {
   } else {
     density = 0;
   }
-
-  //display the result
-  Serial3.print("The current dust concentration is: ");
-  Serial3.print(density);
-  Serial3.print(" ug/m3\n\n");  
   
   return density;
 }
