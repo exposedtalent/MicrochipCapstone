@@ -74,10 +74,11 @@ void loop(void) {
     Serial3.println(temp);
     delay(500);
     counter = 0; // will reset counter and have all the data overwritten
+    fillData();
   }
   // in case we dont get the sleep function to work this can do
   while (time > getTime()) {
-    delay(1);
+    delay(1000);
   }
 }
 
@@ -91,6 +92,7 @@ void fillData() {
   AQData[counter].time = getTime();
   powerDownZMOD();
   counter++;
+  printData();
 }
 
 String stringify(int lower, int upper) { // must have a total bound of 77 items which is 1/4 of AQDataSize
@@ -109,4 +111,22 @@ String stringify(int lower, int upper) { // must have a total bound of 77 items 
   String stringJson;
   serializeJson(jsonArray, stringJson);
   return stringJson;
+}
+
+void printData() {
+  Serial3.print("Dust: ");
+  Serial3.println(AQData[counter - 1].dust);
+  Serial3.print("NO2: ");
+  Serial3.println(AQData[counter - 1].NO2);
+  Serial3.print("O3: ");
+  Serial3.println(AQData[counter - 1].O3);
+  Serial3.print("Humitidty: ");
+  Serial3.println(AQData[counter - 1].humidity);
+  Serial3.print("Temperature: ");
+  Serial3.println(AQData[counter - 1].temp);
+  Serial3.print("Time: ");
+  Serial3.println(AQData[counter - 1].time);
+  Serial3.print("ID: ");
+  Serial3.println(AQData[counter - 1].dust);   
+  Serial3.println();
 }

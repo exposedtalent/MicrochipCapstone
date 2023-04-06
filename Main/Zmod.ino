@@ -10,7 +10,7 @@ void initZmod() {
 
 void powerUpZMOD() {
   if(Serial2)  {
-    Serial3.println("Powering Up ZMOD");
+    //Serial3.println("Powering Up ZMOD");
     memset (zmod_response, 0, SIZE);
     String ID = "";
       while (ID != "S")  {
@@ -18,13 +18,13 @@ void powerUpZMOD() {
         Serial2.readBytesUntil('\n', zmod_response, SIZE);
         ID = String(zmod_response);
       }
-    Serial3.println("Powered Up\n");
+    //Serial3.println("Powered Up\n");
   }
 }
 
 void powerDownZMOD() {
   if(Serial2)  {
-    Serial3.println("Powering Down ZMOD");
+    //Serial3.println("Powering Down ZMOD");
     memset (zmod_response, 0, SIZE);
     String ID = "";
       while (ID != "S")  {
@@ -32,7 +32,7 @@ void powerDownZMOD() {
         Serial2.readBytesUntil('\n', zmod_response, SIZE);
         ID = String(zmod_response);
       }
-    Serial3.println("Powered Down\n");
+    //Serial3.println("Powered Down\n");
   }
 }
 
@@ -71,7 +71,7 @@ void algoOpt() {
 // TODO: currently string bc i dont want to do conversion rn
 String getNO2() {
   if(Serial2)  {
-    Serial3.println("Getting NO2");
+   //Serial3.println("Getting NO2");
     memset (zmod_response, 0, SIZE);
     String NO2 = "F";
       // will return F\n if failure
@@ -80,7 +80,7 @@ String getNO2() {
         Serial2.readBytesUntil('\n', zmod_response, SIZE);
         NO2 = String(zmod_response);
       }
-    Serial3.println("Returning NO2");
+    //Serial3.println("Returning NO2");
     return NO2;
   }
   return "Serial 2 not running";
@@ -89,7 +89,7 @@ String getNO2() {
 // TODO: currently string bc i dont want to do conversion rn
 String getO3() {
   if(Serial2)  {
-    Serial3.println("Getting O3");
+    //Serial3.println("Getting O3");
     memset (zmod_response, 0, SIZE);
     String O3 = "F";
       // will return F\n if failure
@@ -98,7 +98,7 @@ String getO3() {
         Serial2.readBytesUntil('\n', zmod_response, SIZE);
         O3 = String(zmod_response);
       }
-    Serial3.println("Returning O3");
+    //Serial3.println("Returning O3");
     return O3;
   }
   return "Serial 2 not running";
