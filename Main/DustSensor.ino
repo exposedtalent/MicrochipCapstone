@@ -4,6 +4,10 @@
 #define iled PIN_PE2 // D5
 #define vout PIN_PD6 // A0
 
+void initDust() {
+  digitalWrite(iled, LOW); //iled default closed
+}
+
 int Filter(int m)
 {
   static int flag_first = 0, _buff[10], sum;
@@ -31,6 +35,15 @@ int Filter(int m)
   }
 }
 
+void warmUp() {
+  uint32_t time = getTime() + 10;
+  while (time > getTime()) {
+    //Serial3.println("warming up");
+    getDust();
+    delay(50);
+  }
+}
+
 float getDust() {
   //variables
   float density, voltage;
@@ -54,11 +67,6 @@ float getDust() {
   } else {
     density = 0;
   }
-
-  //display the result
-  Serial3.print("The current dust concentration is: ");
-  Serial3.print(density);
-  Serial3.print(" ug/m3\n\n");  
   
   return density;
 }
