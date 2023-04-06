@@ -45,3 +45,11 @@ void printValues() {
     Serial3.println();
     Serial3.println();
 }
+
+byte getTemp() {
+  return static_cast<byte>(bme.readTemperature());
+}
+
+int getHumidity() {
+  return static_cast<int>(100 * bme.readHumidity());
+}
