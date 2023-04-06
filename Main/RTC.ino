@@ -11,3 +11,8 @@ void initRTC() {
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   }
 }
+
+uint32_t getTime() {
+  DateTime now = rtc.now();
+  return now.unixtime();
+}
