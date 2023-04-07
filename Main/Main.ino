@@ -127,6 +127,6 @@ void printData() {
   Serial3.print("Time: ");
   Serial3.println(AQData[counter - 1].time);
   Serial3.print("ID: ");
-  Serial3.println(AQData[counter - 1].dust);   
+  Serial3.println(AQData[counter - 1].id);   
   Serial3.println();
 }
