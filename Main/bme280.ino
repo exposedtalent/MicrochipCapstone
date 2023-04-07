@@ -47,7 +47,7 @@ void printValues() {
 }
 
 byte getTemp() {
-  return static_cast<byte>(bme.readTemperature());
+  return static_cast<byte>(bme.readTemperature() * 9 / 5 + 32);
 }
 
 int getHumidity() {
