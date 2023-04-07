@@ -6,10 +6,14 @@
 #include <log.h>
 #include <String.h>
 #include <RTClib.h>
+#include <lte.h>
+#include <mqtt_client.h>
+#include <ecc608.h>
 #include <ArduinoJson.h>
 #include <avr/sleep.h>
 #include <avr/power.h>
 #include <avr/wdt.h>
+#include <stdlib.h> 
 
 #define iled PIN_PE2 // D5
 #define vout PIN_PD6 // A0
@@ -52,11 +56,17 @@ void setup(void) {
   initBME();
 
   // initializaiton of AWS
-  //setupAWS();
+  setupAWS();
   
   // really not sure if this is needed to be called or not
   // algoOpt();
-  //powerUpZMOD();
+  powerUpZMOD();
+
+  // giving the zmod 30 min warm up... not sure if this is neccesary but zmod is weird
+  uint32_t time = getTime() + 1800;
+  while(time > getTime()) {
+    delay(1000);
+  }
 }
 
 void loop(void) {
@@ -65,14 +75,7 @@ void loop(void) {
     fillData();
   } else {
     // call function to send data to AWS
-    Serial3.println("DATA IS FULL");
-    String temp = stringify(0,77);
-    Serial3.println(temp);
-    delay(1000);
-    Serial3.println();
-    temp = stringify(77,144);
-    Serial3.println(temp);
-    delay(500);
+    sendData();
     counter = 0; // will reset counter and have all the data overwritten
     fillData();
   }
@@ -84,19 +87,21 @@ void loop(void) {
 
 // function that will slowly fill the data structure throughout the day
 void fillData() {
-  powerUpZMOD();
+  //powerUpZMOD();
   warmUp();
   AQData[counter].dust = static_cast<unsigned short>(getDust());
   AQData[counter].NO2 = getNO2().toFloat();
   AQData[counter].O3 = getO3().toFloat();
+  AQData[counter].humidity = getHumidity();
+  AQData[counter].temp = getTemp();
   AQData[counter].time = getTime();
-  powerDownZMOD();
+  //powerDownZMOD();
   counter++;
   printData();
 }
 
-String stringify(int lower, int upper) { // must have a total bound of 77 items which is 1/4 of AQDataSize
-  DynamicJsonDocument jsonDoc(5500); // size limited due to memory constraints so the data will have to serialized in portions
+String stringify(int lower, int upper) { // currently we have to send data in 24 data point blocks
+  DynamicJsonDocument jsonDoc(1200); // size limited due to memory constraints so the data will have to serialized in portions
   JsonArray jsonArray = jsonDoc.to<JsonArray>();
   for (int ii = lower; ii < upper; ii++) {
     JsonObject jsonItem = jsonArray.createNestedObject();
