@@ -36,18 +36,18 @@ The project is a collaboration between Microchip Technology and Arizona State Un
 - [Conclusion](#conclusion)
 
 # Hardware
-## AVR-Cellular mini
+### AVR-Cellular mini
 
 The AVR-Cellular mini is a development board that is used to connect to the internet. It is powered by the ATmega4809 microcontroller and has a built in cellular modem. The board has a built in antenna and a micro USB port for power.  [Link for purchase](https://www.microchip.com/en-us/development-tool/EV70N78A)
 
-## Dust PM 2.5
+### Dust PM 2.5
 
 The Dust PM 2.5 sensor is powered by Sharp GP2Y1010AU0F. The Sharp GP2Y1010AU0F can detect fine particle larger than 0.8μm in diameter, even like the cigarette smoke. Low power consumption, analog voltage output, the output level is linear with dust density. Embedded voltage boost circuit to support wide range of power supply. [Link for purchase](https://www.waveshare.com/dust-sensor.htm)
 
-## ZMOD4510 Module 
+### ZMOD4510 Module 
 
 The ZMOD4510 is a sensor that collects NO2, and O3 gases. The sensor we got was from pcbartists. The sensor is a ZMOD4510 module with a 3.3V regulator. The sensor is powered by 3.3V and has a 0.1" header for the I2C communication. [Link for purchase](https://www.pcbartists.com/product/zmod4510-module/)  
-## BME 280
+### BME 280
 
 This sensor is used to measure the temperature, humidity, and pressure. This comes from SparkFun and is a breakout board for the BME280 sensor. There is a QWICC connector for the I2C communication. [Link for purchase](https://www.sparkfun.com/products/15440)
 
