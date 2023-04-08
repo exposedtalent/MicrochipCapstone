@@ -12,16 +12,12 @@ ASU Temp Campus using Embedded Systems and Machine Learning'.
 The project is made by [Tanishq Mor](https://github.com/exposedtalent), [Carter Dunn](https://github.com/CarterDunn),
 [Amber Kahklen](https://github.com/amberkahklen), [Maxwell Calhoun](https://github.com/Maxwell-Calhoun), [Hunter White](https://github.com/Hoopenflarg), and [David Mangoli](https://github.com/DavidMangoli)
 
-# Project Overview
-The project is a collaboration between Microchip Technology and Arizona State University. The goal of the project is to develop a fully functioning embedded system that can be used to determine the air quality around the ASU Tempe campus. The embedded system will be able to measure the air quality using a Dust PM 2.5, ZMOD4510  and BME 280 sensor and send the data to AWS IoT Core. 
-
 # Table of Contents
 - [Project Overview](#project-overview)
-- [Table of Contents](#table-of-contents)
 - [Hardware](#hardware)
   - [AVR-Cellular mini](#avr-cellular-mini)
   - [Dust PM 2.5](#dust-pm-25)
-  - [ZMOD4510](#zmod4510)
+  - [ZMOD4510](#zmod4510-module)
   - [BME 280](#bme-280)
 - [Software](#software)
   - [Development Environment Setup](#development-environment-setup)
@@ -31,9 +27,12 @@ The project is a collaboration between Microchip Technology and Arizona State Un
     - [Create a Rule in IoT Core](#create-a-rule-in-iot-core)
     - [Create a DynamoDB Table](#create-a-dynamodb-table)
     - [Code with AWS Lambda](#code-with-aws-lambda)
-    - [Test the Lambda Function](#test-the-lambda-function)
+    - [Test the AWS infrastructure](#test-the-aws-infrastructure)
 - [Common Issues](#common-issues)
 - [Conclusion](#conclusion)
+
+# Project Overview
+The project is a collaboration between Microchip Technology and Arizona State University. The goal of the project is to develop a fully functioning embedded system that can be used to determine the air quality around the ASU Tempe campus. The embedded system will be able to measure the air quality using a Dust PM 2.5, ZMOD4510  and BME 280 sensor and send the data to AWS IoT Core. 
 
 # Hardware
 ### AVR-Cellular mini
