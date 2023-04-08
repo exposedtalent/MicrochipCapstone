@@ -1,3 +1,9 @@
+![GitHub Contributors Image](https://contrib.rocks/image?repo=exposedtalent/MicrochipCapstone)
+
+![AWS](https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
+![Arduino](https://img.shields.io/badge/Arduino_IDE-00979D?style=for-the-badge&logo=arduino&logoColor=white)
+
+ 
 # Microchip Capstone
 
 This is the repository for the Microchip Capstone project called 'Microchip Technology - Determining Air Quality Around 
