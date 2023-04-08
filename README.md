@@ -26,21 +26,24 @@ The project is a collaboration between Microchip Technology and Arizona State Un
     - [Create a DynamoDB Table](#create-a-dynamodb-table)
     - [Code with AWS Lambda](#code-with-aws-lambda)
     - [Test the Lambda Function](#test-the-lambda-function)
-  
+- [Common Issues](#common-issues)
+- [Conclusion](#conclusion)
 
 # Hardware
 ## AVR-Cellular mini
 
-The AVR-Cellular mini is a development board that is used to connect to the internet. It is powered by the ATmega4809 microcontroller and has a built in cellular modem. The board has a built in antenna and a micro USB port for power. The board also has a micro SD card slot and a micro USB port for programming. The board is powered by a 3.7V LiPo battery. The board is 1.5 inches by 1.5 inches and is 0.4 inches thick. The board has a 32-bit ARM Cortex-M4 core and a 32-bit AVR core. The board has 32KB of SRAM and 256KB of flash memory. The board has a built in 2.4GHz radio and a built in 3-axis accelerometer. [Link](https://www.microchip.com/en-us/development-tool/EV70N78A)
+The AVR-Cellular mini is a development board that is used to connect to the internet. It is powered by the ATmega4809 microcontroller and has a built in cellular modem. The board has a built in antenna and a micro USB port for power.  [Link for purchase](https://www.microchip.com/en-us/development-tool/EV70N78A)
 
 ## Dust PM 2.5
 
-The Dust PM 2.5 sensor is powered by Sharp GP2Y1010AU0F. The Sharp GP2Y1010AU0F can detect fine particle larger than 0.8μm in diameter, even like the cigarette smoke.Low power consumption, analog voltage output, the output level is linear with dust density. Embedded voltage boost circuit to support wide range of power supply. [Link](https://www.waveshare.com/dust-sensor.htm)
+The Dust PM 2.5 sensor is powered by Sharp GP2Y1010AU0F. The Sharp GP2Y1010AU0F can detect fine particle larger than 0.8μm in diameter, even like the cigarette smoke. Low power consumption, analog voltage output, the output level is linear with dust density. Embedded voltage boost circuit to support wide range of power supply. [Link for purchase](https://www.waveshare.com/dust-sensor.htm)
 
 ## ZMOD4510 Module 
 
+The ZMOD4510 is a sensor that collects NO2, and O3 gases. The sensor we got was from pcbartists. The sensor is a ZMOD4510 module with a 3.3V regulator. The sensor is powered by 3.3V and has a 0.1" header for the I2C communication. [Link for purchase](https://www.pcbartists.com/product/zmod4510-module/)  
 ## BME 280
 
+This sensor is used to measure the temperature, humidity, and pressure. This comes from SparkFun and is a breakout board for the BME280 sensor. There is a QWICC connector for the I2C communication. [Link for purchase](https://www.sparkfun.com/products/15440)
 
 
 # Software
@@ -86,7 +89,7 @@ The Dust PM 2.5 sensor is powered by Sharp GP2Y1010AU0F. The Sharp GP2Y1010AU0F 
 - Select Next.
 - Under the Rules actions section, select Add action.
 - Select Lambda.
-- Select create a lambda function. This will open a new tab in your browser. Give it a name for this project we called it ``messageRedirectToDynamodb``, select the runtime as Python 3.9. Now select ``change the default execution role`` and select the ``Use an existing role``. Use the role you created in the previous step. For this project we used ``lambda-dynamodb-role``.
+- Select create a lambda function. This will open a new tab in your browser. Give it a name for this project we called it ``messageRedirectToDynamodb``, select the runtime as Python 3.9. Now select "Change the default execution role" and select the "Use an existing role". Use the role you created in the previous step. For this project we used ``lambda-dynamodb-role``.
 - Select Create function.
 - Now head back to the AWS IoT Core tab and click refresh. You should see the Lambda function you just created. Select it.
 - Select Next and then select Create rule.
@@ -107,19 +110,20 @@ The Dust PM 2.5 sensor is powered by Sharp GP2Y1010AU0F. The Sharp GP2Y1010AU0F 
 ```python
 import boto3
 from time import strftime, localtime
-import json
-from decimal import Decimal
 
 def lambda_handler(event, context):
+    # The event is a list of dictionaries. Each dictionary is a sensor reading.
     print("The length of the event : %d",len(event))
     for i in range(len(event)):
         isSent = sendDataToDynamodb(event[i])
         if isSent == False:
+            # Printing for CloudWatch logs
             print("There was an error with parse or sending the data")
     return 0
     
 def sendDataToDynamodb(data):
     try:
+        # Establish a connection to DynamoDB. 
         dynamodb = boto3.resource('dynamodb')
         table1 = dynamodb.Table("CapstoneData")
         # Humidity is an int to keep the data size small. We need to convert it to a decimal.
@@ -132,12 +136,13 @@ def sendDataToDynamodb(data):
                 "O3": str(data["o"]),
                 "Dust": data["d"],
                 "Humidity": str(humidity) ,
-                "Temparature": data["c"],
+                "Temperature": data["c"],
                 "id": data["i"]
             }    
         ) 
         return True
     except KeyError:
+        # Printing for CloudWatch logs
         print("There was a Key Error. Here is the data that came")
         print(data)
         return False
@@ -157,3 +162,16 @@ This code will parse the data from the sensors and send it to the DynamoDB table
 - Open the serial monitor and you should see the data being sent to the AWS IoT Core. 
 - Now head back to the AWS IoT Core console. You should see the data being sent to the DynamoDB table.
 - Now you are done! You can now view the data in the DynamoDB table.
+
+
+# Common Issues
+
+- If you are having issues with the AWS IoT Core, make sure you have the correct certificates and keys.
+- If you are having issues with the AWS Lambda function, make sure you have the correct role and the correct code.
+- If you are having issues with the DynamoDB table, make sure you have the correct table name and the correct primary key.
+- If you are having issues with the AWS IoT Core rule, make sure you have the correct SQL statement and the correct Lambda function.
+- If you get a timeout error in AWS Lambda, make sure you have the correct timeout value. You can change it by going to the ``Configuration`` tab and then select ``General Configuration``, click on edit and changing the value in the ``Timeout`` section.
+- While using the IOT provisional tool make sure the device is connected the computer correct or else you will get an error: ``ERROR - Provisioning unable to start - no suitable IoT kits found``
+# Conclusion
+
+In this project, we were able to create a system that can monitor the air quality around ASU campus as well as send the data to AWS IOT Core. We also talked about how the AWS Pipeline looks like. 
