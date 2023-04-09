@@ -55,8 +55,11 @@ void setup(void) {
   // initialization for the BME sensor
   initBME();
 
-  // initializaiton of AWS
-  setupAWS();
+  // initializaiton of AWS... also ensures that the application doesnt move on if there was no connection to AWS established
+  int setup = -1;
+  while (setup != 0) {
+    setup = setupAWS();
+  }
   
   // power up zmod
   powerUpZMOD();
