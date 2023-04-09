@@ -1,8 +1,6 @@
 #define COV_RATIO 0.2 //ug/mmm / mv
 #define NO_DUST_VOLTAGE 400 //mv
 #define SYS_VOLTAGE 3300 //mv
-#define iled PIN_PE2 // D5
-#define vout PIN_PD6 // A0
 
 void initDust() {
   digitalWrite(iled, LOW); //iled default closed
@@ -35,10 +33,9 @@ int Filter(int m)
   }
 }
 
-void warmUp() {
+void warmUpDust() {
   uint32_t time = getTime() + 10;
   while (time > getTime()) {
-    //Serial3.println("warming up");
     getDust();
     delay(50);
   }
