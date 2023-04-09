@@ -30,29 +30,51 @@ bool initMQTTTopics() {
 
 void sendData(){
   // Test MQTT publish and receive
-  for (uint8_t ii = 0; ii < 12; ii++) { // sending 12 blocks of data containing 24 data points 12 * 24 = 288
-    bool published_successfully = MqttClient.publish(mqtt_pub_topic, stringify(ii * 24, ii * 24 + 24).c_str());
-
-    if (published_successfully) { // may want to look into error handling like trying to send the data again
-        Serial3.println("Published message");
-    } else {
-        Serial3.println("Failed to publish\r\n");
+  for (uint8_t ii = 0; ii < AQDataSize/24; ii++) { // sending 12 blocks of data containing 24 data points 12 * 24 = 288 ENSURE THAT AQDataSize % 24 == 0
+    // checks to make sure connection is still on going
+    if (!MqttClient.isConnected()) {
+      Serial3.println("Reconnecting to MQTT broker...");
+      // Attempt to reconnect
+      MqttClient.beginAWS();
+      while (!MqttClient.isConnected()) {
+        Serial3.println(".");
+        delay(500);
+      }
+      Serial3.println("Connected to MQTT broker");
+      // Resubscribe to the topic
+      MqttClient.subscribe(mqtt_sub_topic);
     }
-    String message = MqttClient.readMessage(mqtt_sub_topic);
 
-    // Read message will return an empty string if there were no new
-    // messages, so anything other than that means that there were a
-    // new message
-    if (message != "") {
-        Serial3.println("Got new message: %s\r\n" );
-        Serial3.println(message.c_str());
+    bool published_successfully = false;
+    uint8_t attempts = 0;
+
+    while (!published_successfully && attempts < 2) {
+      published_successfully = MqttClient.publish(mqtt_pub_topic, stringify(ii * 24, ii * 24 + 24).c_str());
+      
+      if (published_successfully) {
+        Serial3.println("Published message");
+      } else {
+        Serial3.println("Failed to publish\r\n");
+        attempts++;
+        delay(1500);
+      }
+
+      String message = MqttClient.readMessage(mqtt_sub_topic);
+
+      // Read message will return an empty string if there were no new
+      // messages, so anything other than that means that there were a
+      // new message
+      if (message != "") {
+          Serial3.println("Got new message: %s\r\n" );
+          Serial3.println(message.c_str());
+      }
     }
   }
 }
 
 int setupAWS() {
 
-  Serial3.println("Starting MQTT Polling for AWS example\r\n");
+  Serial3.println("Starting MQTT Polling for AWS\r\n");
 
   if (initMQTTTopics() == false) {
       Serial3.println("Unable to initialize the MQTT topics. Stopping...");
