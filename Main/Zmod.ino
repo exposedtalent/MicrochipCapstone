@@ -36,9 +36,26 @@ void powerDownZMOD() {
   }
 }
 
+void warmUpZmod() {
+  // 30 minute warm up time
+  uint32_t time = getTime() + 1800;
+  while (time > getTime()) {
+    Serial3.print("AQI: ");
+    Serial3.println(getAQI());
+    Serial3.print("NO2: ");
+    Serial3.println(getNO2());
+    Serial3.print("O3: ");
+    Serial3.println(getO3());
+    Serial3.println();
+    delay(2000);
+  }
+  Serial3.println("Warm up for ZMOD is complete\n");
+  // optimization is best done after warmup
+  algoOpt();
+}
+
 String getAQI() {
   if(Serial2)  {
-    Serial3.println("Getting AQI");
     memset (zmod_response, 0, SIZE);
     String AQI = "F";
       while (AQI == "F")  {
@@ -46,7 +63,6 @@ String getAQI() {
         Serial2.readBytesUntil('\n', zmod_response, SIZE);
         AQI = String(zmod_response);
       }
-    Serial3.println("Returning AQI");
     return AQI;
   }
   return "Serial 2 not running";
