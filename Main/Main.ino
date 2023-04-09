@@ -26,7 +26,7 @@
 Adafruit_BME280 bme; // I2C
 RTC_PCF8523 rtc; // I2C
 
-struct airQuality {
+struct airQuality { // 18 bytes in total, memory block is 20 bytes 20 bytes * 288 = 5760 bytes
   float NO2; // 4 bytes
   float O3; // 4 bytes
   uint32_t time; // 4 bytes
@@ -58,15 +58,11 @@ void setup(void) {
   // initializaiton of AWS
   setupAWS();
   
-  // really not sure if this is needed to be called or not
-  // algoOpt();
+  // power up zmod
   powerUpZMOD();
 
-  // giving the zmod 30 min warm up... not sure if this is neccesary but zmod is weird
-  uint32_t time = getTime() + 1800;
-  while(time > getTime()) {
-    delay(1000);
-  }
+  // 30 minute warm up period
+  warmUpZmod();
 }
 
 void loop(void) {
@@ -88,7 +84,8 @@ void loop(void) {
 // function that will slowly fill the data structure throughout the day
 void fillData() {
   //powerUpZMOD();
-  warmUp();
+  //found this to be the only way to get consistently accurate data from the dust sensor
+  warmUpDust();
   AQData[counter].dust = static_cast<unsigned short>(getDust());
   AQData[counter].NO2 = getNO2().toFloat();
   AQData[counter].O3 = getO3().toFloat();
@@ -101,6 +98,7 @@ void fillData() {
 }
 
 String stringify(int lower, int upper) { // currently we have to send data in 24 data point blocks
+  // memory is automatically deallocated once out of scope but behaves slowly so limited to only 1200 unfortunately
   DynamicJsonDocument jsonDoc(1200); // size limited due to memory constraints so the data will have to serialized in portions
   JsonArray jsonArray = jsonDoc.to<JsonArray>();
   for (int ii = lower; ii < upper; ii++) {
@@ -119,6 +117,8 @@ String stringify(int lower, int upper) { // currently we have to send data in 24
 }
 
 void printData() {
+  Serial3.print("Counter: ");
+  Serial3.println(counter - 1);
   Serial3.print("Dust: ");
   Serial3.println(AQData[counter - 1].dust);
   Serial3.print("NO2: ");
