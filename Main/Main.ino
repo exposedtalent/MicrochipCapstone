@@ -36,6 +36,38 @@ struct airQuality { // 18 bytes in total, memory block is 20 bytes 20 bytes * 14
   byte id = location; // 1 byte
 };
 
+// DISCLAIMER CODE WONKY AGAIN
+// in a file called low_power.cpp located at Arduino\libraries\AVR-IoT-Cellular\src
+// there is this function
+// ISR(RTC_PIT_vect) {
+//     RTC.PITINTFLAGS = RTC_PI_bm;
+//     pit_triggered   = true;
+// }
+// comment it out, or else you will get an error saying "multiple definitions of: __vector_6"
+// it's because there are multiple definition for an interrupt and getting rid of one of them
+// makes the code work. awesome :)
+
+// RTC code used from DxCore documentation
+void RTC_init(void)
+{
+  /* Initialize RTC: */
+  while (RTC.STATUS > 0)
+  {
+    ;                                   /* Wait for all register to be synchronized */
+  }
+  RTC.CLKSEL = RTC_CLKSEL_INT32K_gc;    /* 32.768kHz Internal Ultra-Low-Power Oscillator (OSCULP32K) */
+
+  RTC.PITINTCTRL = RTC_PI_bm;           /* PIT Interrupt: enabled */
+
+  RTC.PITCTRLA = RTC_PERIOD_CYC16384_gc /* RTC Clock Cycles 16384, resulting in 32.768kHz/16384 = 2Hz = 0.5 sec.*/
+  | RTC_PITEN_bm;                       /* Enable PIT counter: enabled */
+}
+
+ISR(RTC_PIT_vect)
+{
+  RTC.PITINTFLAGS = RTC_PI_bm;          /* Clear interrupt flag by writing '1' (required) */
+}
+
 airQuality AQData[AQDataSize]; // global array structure for the data that is going to be sent to AWS
 int counter = 0; // global counter that will be used to itterate through AQData
 
@@ -55,6 +87,14 @@ void setup(void) {
   // initialization for the BME sensor
   initBME();
 
+  // Initalize onboard RTC
+  RTC_init();
+
+  // set type of sleep mode, this is the one that uses the minimum amount of power
+  // Only module that will be on is the RTC, everything else is off
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  sleep_enable(); // enables the sleep mode functionality
+
   // initializaiton of AWS... also ensures that the application doesnt move on if there was no connection to AWS established
   int setup = -1;
   while (setup != 0) {
@@ -68,6 +108,7 @@ void setup(void) {
   warmUpZmod();
 }
 
+#define TIME_TO_SLEEP_IN_SECS 10
 void loop(void) {
   uint32_t time = getTime() + 300;
   if (counter < AQDataSize) {
@@ -78,10 +119,18 @@ void loop(void) {
     counter = 0; // will reset counter and have all the data overwritten
     fillData();
   }
-  // in case we dont get the sleep function to work this can do
+  /* in case we dont get the sleep function to work this can do
   while (time > getTime()) {
     delay(1000);
+  }*/
+
+  Serial3.println("I sleep now");
+  delay(100);
+  for(int i = 0; i < TIME_TO_SLEEP_IN_SECS; i++) // sleep for 10 seconds
+  {
+    sleep_cpu();
   }
+  Serial3.println("I awake");
 }
 
 // function that will slowly fill the data structure throughout the day
