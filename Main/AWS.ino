@@ -47,7 +47,8 @@ void sendData(){
 
     bool published_successfully = false;
     uint8_t attempts = 0;
-
+    
+    // in case of failure to send the data it will try again but otherwise data will be tossed
     while (!published_successfully && attempts < 2) {
       published_successfully = MqttClient.publish(mqtt_pub_topic, stringify(ii * 24, ii * 24 + 24).c_str());
       
