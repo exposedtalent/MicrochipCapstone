@@ -20,13 +20,13 @@
 #define RXD2 PIN_PF5 // RX
 #define TXD2 PIN_PF4 // TX
 #define USART_RXMODE0_bm  (1<<1)  /* Receiver Mode bit 0 mask. */
-#define AQDataSize 288 // 12 readings per hour * 24 hours
+#define AQDataSize 144 // 12 readings per hour * 12 hours
 #define location 0 // used as a unique id for each location so we can track data
 
 Adafruit_BME280 bme; // I2C
 RTC_PCF8523 rtc; // I2C
 
-struct airQuality { // 18 bytes in total, memory block is 20 bytes 20 bytes * 288 = 5760 bytes
+struct airQuality { // 18 bytes in total, memory block is 20 bytes 20 bytes * 144 = 2880 bytes
   float NO2; // 4 bytes
   float O3; // 4 bytes
   uint32_t time; // 4 bytes
@@ -86,7 +86,7 @@ void loop(void) {
 
 // function that will slowly fill the data structure throughout the day
 void fillData() {
-  //powerUpZMOD();
+  powerUpZMOD();
   //found this to be the only way to get consistently accurate data from the dust sensor
   warmUpDust();
   AQData[counter].dust = static_cast<unsigned short>(getDust());
@@ -95,14 +95,13 @@ void fillData() {
   AQData[counter].humidity = getHumidity();
   AQData[counter].temp = getTemp();
   AQData[counter].time = getTime();
-  //powerDownZMOD();
+  powerDownZMOD();
   counter++;
   printData();
 }
 
 String stringify(int lower, int upper) { // currently we have to send data in 24 data point blocks
-  // memory is automatically deallocated once out of scope but behaves slowly so limited to only 1200 unfortunately
-  DynamicJsonDocument jsonDoc(1200); // size limited due to memory constraints so the data will have to serialized in portions
+  DynamicJsonDocument jsonDoc(3000); // size limited due to memory constraints so the data will have to serialized in portions
   JsonArray jsonArray = jsonDoc.to<JsonArray>();
   for (int ii = lower; ii < upper; ii++) {
     JsonObject jsonItem = jsonArray.createNestedObject();
@@ -121,14 +120,14 @@ String stringify(int lower, int upper) { // currently we have to send data in 24
 
 void printData() {
   Serial3.print("Counter: ");
-  Serial3.println(counter - 1);
+  Serial3.println(counter);
   Serial3.print("Dust: ");
   Serial3.println(AQData[counter - 1].dust);
   Serial3.print("NO2: ");
   Serial3.println(AQData[counter - 1].NO2);
   Serial3.print("O3: ");
   Serial3.println(AQData[counter - 1].O3);
-  Serial3.print("Humitidty: ");
+  Serial3.print("Humidity: ");
   Serial3.println(AQData[counter - 1].humidity);
   Serial3.print("Temperature: ");
   Serial3.println(AQData[counter - 1].temp);
