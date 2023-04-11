@@ -22,6 +22,7 @@
 #define USART_RXMODE0_bm  (1<<1)  /* Receiver Mode bit 0 mask. */
 #define AQDataSize 144 // 12 readings per hour * 12 hours
 #define location 0 // used as a unique id for each location so we can track data
+#define TIME_TO_SLEEP_IN_SECS 280
 
 Adafruit_BME280 bme; // I2C
 RTC_PCF8523 rtc; // I2C
@@ -35,38 +36,6 @@ struct airQuality { // 18 bytes in total, memory block is 20 bytes 20 bytes * 14
   byte temp; // 1 byte
   byte id = location; // 1 byte
 };
-
-// DISCLAIMER CODE WONKY AGAIN
-// in a file called low_power.cpp located at Arduino\libraries\AVR-IoT-Cellular\src
-// there is this function
-// ISR(RTC_PIT_vect) {
-//     RTC.PITINTFLAGS = RTC_PI_bm;
-//     pit_triggered   = true;
-// }
-// comment it out, or else you will get an error saying "multiple definitions of: __vector_6"
-// it's because there are multiple definition for an interrupt and getting rid of one of them
-// makes the code work. awesome :)
-
-// RTC code used from DxCore documentation
-void RTC_init(void)
-{
-  /* Initialize RTC: */
-  while (RTC.STATUS > 0)
-  {
-    ;                                   /* Wait for all register to be synchronized */
-  }
-  RTC.CLKSEL = RTC_CLKSEL_INT32K_gc;    /* 32.768kHz Internal Ultra-Low-Power Oscillator (OSCULP32K) */
-
-  RTC.PITINTCTRL = RTC_PI_bm;           /* PIT Interrupt: enabled */
-
-  RTC.PITCTRLA = RTC_PERIOD_CYC16384_gc /* RTC Clock Cycles 16384, resulting in 32.768kHz/16384 = 2Hz = 0.5 sec.*/
-  | RTC_PITEN_bm;                       /* Enable PIT counter: enabled */
-}
-
-ISR(RTC_PIT_vect)
-{
-  RTC.PITINTFLAGS = RTC_PI_bm;          /* Clear interrupt flag by writing '1' (required) */
-}
 
 airQuality AQData[AQDataSize]; // global array structure for the data that is going to be sent to AWS
 int counter = 0; // global counter that will be used to itterate through AQData
@@ -108,7 +77,6 @@ void setup(void) {
   warmUpZmod();
 }
 
-#define TIME_TO_SLEEP_IN_SECS 10
 void loop(void) {
   uint32_t time = getTime() + 300;
   if (counter < AQDataSize) {
@@ -119,18 +87,17 @@ void loop(void) {
     counter = 0; // will reset counter and have all the data overwritten
     fillData();
   }
-  /* in case we dont get the sleep function to work this can do
-  while (time > getTime()) {
-    delay(1000);
-  }*/
-
-  Serial3.println("I sleep now");
+  
   delay(100);
+  
   for(int i = 0; i < TIME_TO_SLEEP_IN_SECS; i++) // sleep for 10 seconds
   {
     sleep_cpu();
   }
-  Serial3.println("I awake");
+
+  while (time > getTime()) {
+    delay(1000);
+  }
 }
 
 // function that will slowly fill the data structure throughout the day
