@@ -22,6 +22,7 @@
 #define USART_RXMODE0_bm  (1<<1)  /* Receiver Mode bit 0 mask. */
 #define AQDataSize 144 // 12 readings per hour * 12 hours
 #define location 0 // used as a unique id for each location so we can track data
+#define TIME_TO_SLEEP_IN_SECS 280
 
 Adafruit_BME280 bme; // I2C
 RTC_PCF8523 rtc; // I2C
@@ -55,6 +56,14 @@ void setup(void) {
   // initialization for the BME sensor
   initBME();
 
+  // Initalize onboard RTC
+  RTC_init();
+
+  // set type of sleep mode, this is the one that uses the minimum amount of power
+  // Only module that will be on is the RTC, everything else is off
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  sleep_enable(); // enables the sleep mode functionality
+
   // initializaiton of AWS... also ensures that the application doesnt move on if there was no connection to AWS established
   int setup = -1;
   while (setup != 0) {
@@ -78,7 +87,14 @@ void loop(void) {
     counter = 0; // will reset counter and have all the data overwritten
     fillData();
   }
-  // in case we dont get the sleep function to work this can do
+  
+  delay(100);
+  
+  for(int i = 0; i < TIME_TO_SLEEP_IN_SECS; i++) // sleep for 10 seconds
+  {
+    sleep_cpu();
+  }
+
   while (time > getTime()) {
     delay(1000);
   }
@@ -86,7 +102,7 @@ void loop(void) {
 
 // function that will slowly fill the data structure throughout the day
 void fillData() {
-  powerUpZMOD();
+  //powerUpZMOD();
   //found this to be the only way to get consistently accurate data from the dust sensor
   warmUpDust();
   AQData[counter].dust = static_cast<unsigned short>(getDust());
@@ -95,7 +111,7 @@ void fillData() {
   AQData[counter].humidity = getHumidity();
   AQData[counter].temp = getTemp();
   AQData[counter].time = getTime();
-  powerDownZMOD();
+  //powerDownZMOD();
   counter++;
   printData();
 }
