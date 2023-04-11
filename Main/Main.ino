@@ -102,7 +102,7 @@ void loop(void) {
 
 // function that will slowly fill the data structure throughout the day
 void fillData() {
-  powerUpZMOD();
+  //powerUpZMOD();
   //found this to be the only way to get consistently accurate data from the dust sensor
   warmUpDust();
   AQData[counter].dust = static_cast<unsigned short>(getDust());
@@ -111,7 +111,7 @@ void fillData() {
   AQData[counter].humidity = getHumidity();
   AQData[counter].temp = getTemp();
   AQData[counter].time = getTime();
-  powerDownZMOD();
+  //powerDownZMOD();
   counter++;
   printData();
 }
